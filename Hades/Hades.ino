@@ -31,7 +31,7 @@ LinkedList<String> dataList;
 void setup() {
   // put your setup code here, to run once:
   
-  Serial.begin(9600);
+  Serial.begin(19200);
   Serial.println("00.00;00.00");
 
   pinMode(UNLOCKEDL_PIN, OUTPUT);
@@ -49,11 +49,6 @@ void setup() {
 }
 
 void loop() {
-  DHT.read(DHT11PIN);
-
-  float humidity = DHT.humidity;
-  float temperature = DHT.temperature;
-
   if (stringComplete) {
       stringComplete = false;
       
@@ -94,6 +89,11 @@ void loop() {
     }
       inputString = "";
   }
+
+  DHT.read(DHT11PIN);
+
+  float humidity = DHT.humidity;
+  float temperature = DHT.temperature;
 
   if (temperature != -1 && humidity != -1)
     {
@@ -222,11 +222,11 @@ void getCommand()
     } 
     
     // Remove RFID
-    else if (inputString.substring(0, 1) == "^") {
-      String rfid_data = inputString.substring(1, 12);
-      removeStringFromList(rfid_data);
-      inputString = "";
-    }
+    // else if (inputString.substring(0, 1) == "^") {
+    //   String rfid_data = inputString.substring(1, 12);
+    //   removeStringFromList(rfid_data);
+    //   inputString = "";
+    // }
   }
 }
 
