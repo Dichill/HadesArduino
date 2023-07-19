@@ -45,6 +45,7 @@ namespace HadesArduino.MVVM.ViewModel
         public RelayCommand? TurnLedCommand { get; set; }
         public RelayCommand? RegisterCommand { get; set; }
         SerialPort? serialPort { get; set; }
+        UserService userService { get; set; }
 
         void ResetConfig()
         {
@@ -56,10 +57,10 @@ namespace HadesArduino.MVVM.ViewModel
         {
             GlobalViewModel.IsPortOpen = false;
             serialPort = new SerialPort();
+            userService = new UserService();
 
             SerialPortCollection = new ObservableCollection<string>();
-            UserRegisteredCollection = new ObservableCollection<UserModel>();
-
+            UserRegisteredCollection = userService.Read();
 
             PopulatePortCollection();
 
@@ -89,6 +90,7 @@ namespace HadesArduino.MVVM.ViewModel
                         else
                             state = "OF";
                         serialPort.Write(string.Format("#{0}{1}\n", o, state));
+
                         break;
                     case "LED2":
                         if (_led2State == true)
@@ -119,7 +121,7 @@ namespace HadesArduino.MVVM.ViewModel
                 if (SelectedPort != null)
                 {
                     serialPort.PortName = SelectedPort;
-                    serialPort.BaudRate = 9600;
+                    serialPort.BaudRate = 19200;
                     serialPort.Parity = Parity.None;
                     serialPort.DataBits = 8;
                     serialPort.StopBits = StopBits.One;
@@ -130,6 +132,8 @@ namespace HadesArduino.MVVM.ViewModel
                     {
                         serialPort.Open();
                         GlobalViewModel.IsPortOpen = serialPort.IsOpen;
+
+                        AddRegisteredToSystem();
                     }
                     catch (Exception err)
                     {
@@ -164,6 +168,38 @@ namespace HadesArduino.MVVM.ViewModel
                 SerialPortCollection?.Add(x);
             }
         }
+
+        async void AddRegisteredToSystem()
+        {
+            if (GlobalViewModel.IsPortOpen)
+            {
+                if (UserRegisteredCollection.Count > 0)
+                {
+                    foreach (UserModel user in UserRegisteredCollection)
+                    {
+                        await Task.Delay(2000);
+
+                        // Get the RFID value from the UserModel
+                        string rfidValue = user.RFID;
+
+                        //new Task(async () =>
+                        //{
+                        //    await Task.Delay(2000);
+
+                        //    Application.Current.Dispatcher.Invoke(() =>
+                        //    {
+                        // Write the RFID value to the serial port
+                        serialPort.Write(string.Format("${0}\n", rfidValue));
+                        //});
+                        await Task.Delay(1000);
+                        //await Task.Delay(1000);
+                        //});
+                    }
+                }
+            };
+            
+        }
+        
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
@@ -185,15 +221,14 @@ namespace HadesArduino.MVVM.ViewModel
                         RegisterDialog?.Close();
 
                         if (GlobalViewModel.FullNameRegister != "")
-                        {
-                            UserRegisteredCollection?.Add(new UserModel
+                        {                            
+                            userService.Create(new UserModel
                             {
                                 Fullname = GlobalViewModel.FullNameRegister,
                                 RFID = val[2],
                                 isActive = true,
                                 dateCreated = DateTime.Now,
                             });
-
                             GlobalViewModel.CurrentRFIDRegistered = val[2];
                             GlobalViewModel.FullNameRegister = "";
                         }

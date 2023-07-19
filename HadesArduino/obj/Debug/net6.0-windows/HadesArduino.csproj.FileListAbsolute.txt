@@ -33,3 +33,4 @@ C:\Users\Dichi\source\repos\HadesArduino\HadesArduino\bin\Debug\net6.0-windows\r
 C:\Users\Dichi\source\repos\HadesArduino\HadesArduino\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.IO.Ports.dll
 C:\Users\Dichi\source\repos\HadesArduino\HadesArduino\obj\Debug\net6.0-windows\UserControl\TextDialog.baml
 C:\Users\Dichi\source\repos\HadesArduino\HadesArduino\obj\Debug\net6.0-windows\UserControl\TextDialog.g.cs
+C:\Users\Dichi\source\repos\HadesArduino\HadesArduino\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
