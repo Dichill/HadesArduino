@@ -5,9 +5,9 @@
   *  Whitelist System
 
 ## Documentation
-Check out these pictures and see for yourself!
+Check out these pictures or you can see <a href="https://www.youtube.com/watch?v=1-T2tkkU8MM">the demo</a>!
 
-<a href="https://www.youtube.com/watch?v=1-T2tkkU8MM">Watch Demo</a>
+
 
 ## **:handshake: Contributing**
 
