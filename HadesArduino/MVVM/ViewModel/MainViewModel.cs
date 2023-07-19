@@ -178,22 +178,10 @@ namespace HadesArduino.MVVM.ViewModel
                     foreach (UserModel user in UserRegisteredCollection)
                     {
                         await Task.Delay(2000);
-
-                        // Get the RFID value from the UserModel
                         string rfidValue = user.RFID;
 
-                        //new Task(async () =>
-                        //{
-                        //    await Task.Delay(2000);
-
-                        //    Application.Current.Dispatcher.Invoke(() =>
-                        //    {
-                        // Write the RFID value to the serial port
                         serialPort.Write(string.Format("${0}\n", rfidValue));
-                        //});
                         await Task.Delay(1000);
-                        //await Task.Delay(1000);
-                        //});
                     }
                 }
             };
@@ -239,9 +227,7 @@ namespace HadesArduino.MVVM.ViewModel
             }
             catch (Exception err)
             {
-                //MessageBox.Show("An unexpected error has occured, see full details below\n" + err.ToString(), "Hades System", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 GlobalViewModel.HadesLogs += "[HADES-WARNING] " + err.Message + "\n" + err.ToString();
-                //serialPort?.Close();
             }
 
             GlobalViewModel.HadesLogs += "[HADES LOGS] ~ " + data + "\n";
