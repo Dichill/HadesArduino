@@ -1,8 +1,11 @@
 <img src="">
 
 ## HadesArduino
-* Hades Arduino offers Attendance System, Checking System, and Whitelist System for RFID Projects. It has the capability to do anything with RFID whether it be for Hotel Management, For Attendance, so on or so forth.
-
+* Hades Arduino has these features available
+** Attendance System
+** Checking System
+** Whitelist System
+  It has the capability to do anything with RFID whether it be for Hotel Management, For Attendance, so on or so forth.
 ## Documentation
 Check out these pictures and see for yourself!
 
