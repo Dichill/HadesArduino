@@ -1,0 +1,73 @@
+﻿<Border x:Class="HadesArduino.UserControl.TextDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:vm="clr-namespace:HadesArduino.MVVM.ViewModel"
+        CornerRadius="10"
+        Width="200"
+        MaxWidth="400"
+        Height="247"
+        Background="{DynamicResource RegionBrush}"
+        x:Name="MyBorder">
+    <Border.DataContext>
+        <vm:GlobalViewModel/>
+    </Border.DataContext>
+    
+    <Border.Resources>
+        <Storyboard x:Key="WidthAnimationStoryboard" Completed="Storyboard_Completed_1">
+            <DoubleAnimation
+                Storyboard.TargetName="MyBorder"
+                Storyboard.TargetProperty="Width"
+                From="200"
+                To="400"
+                Duration="0:0:1" />
+        </Storyboard>
+
+        <!-- Storyboard to fade out the old Grid -->
+        <Storyboard x:Key="FadeOutStoryboard" Completed="Storyboard_Completed">
+            <DoubleAnimation
+                Storyboard.TargetName="FirstGrid"
+                Storyboard.TargetProperty="Opacity"
+                From="1"
+                To="0"
+                Duration="0:0:1" />
+        </Storyboard>
+
+        <!-- Storyboard to fade in the new Grid -->
+        <Storyboard x:Key="FadeInStoryboard">
+            <DoubleAnimation
+                Storyboard.TargetName="SecondGrid"
+                Storyboard.TargetProperty="Opacity"
+                From="0"
+                To="1"
+                Duration="0:0:1" />
+        </Storyboard>
+    </Border.Resources>
+    <Grid>
+        <Grid x:Name="FirstGrid" UseLayoutRounding="True">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!--<hc:LoadingLine Margin="0,30" Foreground="Yellow" Style="{StaticResource LoadingLineLarge}"/>
+            <TextBlock Style="{StaticResource TextBlockLargeBold}" FontSize="15" Text="Registering"/>
+            <TextBlock Style="{StaticResource TextBlockBaseStyle}" FontSize="12" Text="Tap Card when Yellow Light Flashes"/>-->
+
+                <hc:Gravatar Height="100" Width="100" Id="{Binding Text,ElementName=NameTxtBox}" Margin="10"/>
+                <hc:TextBox Text="{Binding FullNameRegister,  Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" hc:InfoElement.Placeholder="Full Name" Name="NameTxtBox"/>
+                <Button Click="Button_Click" Margin="0 10 0 0" Width="120" Content="Register" Cursor="Hand">
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard Storyboard="{StaticResource FadeOutStoryboard}" />
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="SecondGrid" Opacity="0" UseLayoutRounding="True" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <hc:LoadingLine Margin="0,30" Foreground="Yellow" Style="{StaticResource LoadingLineLarge}"/>
+                <TextBlock Style="{StaticResource TextBlockLargeBold}" FontSize="15" Text="Registering"/>
+                <TextBlock Style="{StaticResource TextBlockBaseStyle}" FontSize="12" Text="Tap Card when Yellow Light Flashes"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Border>

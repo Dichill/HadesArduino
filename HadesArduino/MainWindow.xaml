@@ -1,0 +1,107 @@
+﻿<hc:Window x:Class="HadesArduino.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HadesArduino"
+        xmlns:vm="clr-namespace:HadesArduino.MVVM.ViewModel"
+        mc:Ignorable="d"
+        ShowTitle="True"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Title="Hades System" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance vm:MainViewModel,
+                                     IsDesignTimeCreatable=False}">
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border CornerRadius="0 0 13 13">
+            <Border.Background>
+                <SolidColorBrush Color="#242426" Opacity="0.8"/>
+            </Border.Background>
+            <hc:SimpleStackPanel Orientation="Horizontal">
+                <hc:ComboBox Width="100" Margin="10 5 5 5" SelectedValue="{Binding SelectedPort}" ItemsSource="{Binding SerialPortCollection}"/>
+                <Button Content="▶︎" Foreground="#b0dc6b" Command="{Binding OpenPortCommand}" Cursor="Hand" Margin="3 0 3 0"/>
+                <Button Content="⟳" Foreground="#d7ba7c" Command="{Binding RefreshPortCommand}" FontSize="13" Cursor="Hand" Margin="3 0 3 0"/>
+                <Button Content="𓆣" Foreground="#d22a46" Cursor="Hand" Margin="3 0 3 0"/>
+                <Button Command="{Binding RegisterCommand}" Content="REG" IsEnabled="{Binding GlobalViewModel.IsPortOpen}" FontWeight="Bold" Foreground="#85caea" Cursor="Hand" Margin="3 0 3 0"/>
+                <hc:Divider LineStrokeThickness="2" Orientation="Vertical" MaxHeight="16"/>
+                <TextBlock Text="{Binding GlobalViewModel.RoomTemperature}" Foreground="WhiteSmoke" VerticalAlignment="Center" FontSize="16" Margin="5 0 5 0" ToolTip="Room Temperature"/>
+                <hc:Divider LineStrokeThickness="2" Orientation="Vertical" MaxHeight="16"/>
+                <TextBlock Text="{Binding GlobalViewModel.RoomHumidity}" Foreground="WhiteSmoke" VerticalAlignment="Center" FontSize="16" Margin="5 0 0 0" ToolTip="Room Humidity"/>
+            </hc:SimpleStackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <hc:TabControl IsAnimationEnabled="True" ShowCloseButton="False" IsDraggable="True" IsTabFillEnabled="True" Width="auto" Height="auto" Margin="0 0 5 0" IsEnabled="{Binding GlobalViewModel.IsPortOpen}">
+                <hc:TabItem Header="Controls" IsSelected="True">
+                    <hc:SimpleStackPanel Background="{DynamicResource RegionBrush}" Orientation="Vertical">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="60">
+                            <CheckBox IsChecked="{Binding Led1State}" Content="Green" Command="{Binding TurnLedCommand}" CommandParameter="LED1"/>
+                            <hc:Divider LineStrokeThickness="2" Orientation="Vertical" MaxHeight="16"/>
+                            <CheckBox IsChecked="{Binding Led2State}" Content="Yellow" Command="{Binding TurnLedCommand}" CommandParameter="LED2"/>
+                            <hc:Divider LineStrokeThickness="2" Orientation="Vertical" MaxHeight="16"/>
+                            <CheckBox IsChecked="{Binding Led3State}" Content="Red" Command="{Binding TurnLedCommand}" CommandParameter="LED3"/>
+                        </StackPanel>
+                    </hc:SimpleStackPanel>
+                </hc:TabItem>
+                <hc:TabItem Header="Feature 2">
+                    <hc:SimplePanel Background="{DynamicResource RegionBrush}"/>
+                </hc:TabItem>
+                <hc:TabItem Header="Feature 3">
+                    <hc:SimplePanel Background="{DynamicResource RegionBrush}"/>
+                </hc:TabItem>
+            </hc:TabControl>
+
+            <Border Grid.RowSpan="2" Grid.Column="1" CornerRadius="8" Background="{DynamicResource RegionBrush}">
+                <ListView Background="Transparent" ItemsSource="{Binding UserRegisteredCollection}" HorizontalContentAlignment="Stretch">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+
+                                    <hc:Gravatar Height="80" Width="80" Id="{Binding Fullname}" Margin="10"/>
+                                    <hc:SimpleStackPanel VerticalAlignment="Center" Grid.Column="1">
+                                        <TextBlock Text="{Binding Fullname}"/>
+                                        <hc:RunningBlock Content="{Binding RFID}" Height="40" FontSize="12"/>
+                                        <TextBlock Text="{Binding dateCreated}"/>
+                                    </hc:SimpleStackPanel>
+
+                                    <hc:SimpleStackPanel Grid.Column="2" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Center" Cursor="Hand">
+                                        <Button Content="Delete" Width="70" Margin="0 0 0 2"/>
+                                        <Button Content="History" Width="70" Margin="0 0 0 2"/>
+                                    </hc:SimpleStackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Border>
+            <TextBox Margin="5 5 5 0" Grid.Row="01" Grid.Column="0" Text="{Binding GlobalViewModel.HadesLogs}"/>
+        </Grid>
+    </Grid>
+</hc:Window>
