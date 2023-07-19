@@ -1,4 +1,5 @@
 #include <DFRobot_DHT11.h>
+#include <ArduinoJson.h>
 #include <LinkedList.h>
 #include <MFRC522.h>
 #include <SPI.h>
@@ -25,6 +26,9 @@ boolean lockMode = false;
 boolean registerMode = false;
 String commandString = "";
 String toRegister = "";
+
+const int BUFFER_SIZE = 256; // Adjust the buffer size based on your JSON data size
+char buffer[BUFFER_SIZE];
 
 LinkedList<String> dataList;
 
@@ -217,9 +221,27 @@ void getCommand()
     } 
     
     else if (inputString.substring(0,1) == "$") {
-      String rfid_data = inputString.substring(1, 12);
-      dataList.add(rfid_data);
-    } 
+      StaticJsonDocument<BUFFER_SIZE> jsonDocument;
+      DeserializationError error = deserializeJson(jsonDocument, inputString.c_str() + 1); // Skip the first character '$'
+
+      if (error) {
+        Serial.println("Error parsing JSON");
+      } else {
+        // Clear the existing LinkedList before adding new elements
+        dataList.clear();
+      } 
+
+      // Extract and store the data values in the LinkedList
+      JsonArray dataArray = jsonDocument.as<JsonArray>();
+      for (JsonVariant dataValue : dataArray) {
+        if (dataValue.is<String>()) {
+          String dataString = dataValue.as<String>();
+          dataString.trim(); // Remove leading and trailing whitespaces
+          // Add the data value to the LinkedList
+          dataList.add(dataString);
+        }
+      }
+    }
     
     // Remove RFID
     // else if (inputString.substring(0, 1) == "^") {

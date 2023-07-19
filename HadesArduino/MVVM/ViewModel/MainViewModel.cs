@@ -3,6 +3,7 @@ using HadesArduino.MVVM.Model;
 using HadesArduino.UserControl;
 using HandyControl.Controls;
 using HandyControl.Tools.Extension;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -171,21 +172,21 @@ namespace HadesArduino.MVVM.ViewModel
 
         async void AddRegisteredToSystem()
         {
-            if (GlobalViewModel.IsPortOpen)
-            {
-                if (UserRegisteredCollection.Count > 0)
-                {
-                    foreach (UserModel user in UserRegisteredCollection)
-                    {
-                        await Task.Delay(2000);
-                        string rfidValue = user.RFID;
+            await Task.Delay(2000);
+            // Create a list to store RFID values
+            List<string> rfidValues = new List<string>();
 
-                        serialPort.Write(string.Format("${0}\n", rfidValue));
-                        await Task.Delay(1000);
-                    }
-                }
-            };
-            
+            foreach (UserModel user in UserRegisteredCollection)
+            {
+                // Get the RFID value from the UserModel
+                string rfidValue = user.RFID;
+                rfidValues.Add(rfidValue);
+
+            }
+
+            // Serialize the list of RFID values to a JSON array
+            string jsonPayload = JsonConvert.SerializeObject(rfidValues);
+            serialPort.Write("$" + jsonPayload + "\n");
         }
         
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
@@ -227,7 +228,9 @@ namespace HadesArduino.MVVM.ViewModel
             }
             catch (Exception err)
             {
+                //MessageBox.Show("An unexpected error has occured, see full details below\n" + err.ToString(), "Hades System", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 GlobalViewModel.HadesLogs += "[HADES-WARNING] " + err.Message + "\n" + err.ToString();
+                //serialPort?.Close();
             }
 
             GlobalViewModel.HadesLogs += "[HADES LOGS] ~ " + data + "\n";
