@@ -1,6 +1,4 @@
-[![Watch Demo](https://img.youtube.com/vi/1-T2tkkU8MM/0.jpg)](https://www.youtube.com/watch?v=1-T2tkkU8MM)
-
-## Hades Arduino
+<a href="https://www.youtube.com/watch?v=1-T2tkkU8MM"><h2>Hades Arduino</h2></a>
 * Hades Arduino has these features available, It has the capability to do anything with RFID whether it be for **Hotel Management** or for **Attendace** so on or so forth.
   * Attendance System
   * Checking System
