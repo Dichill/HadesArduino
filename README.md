@@ -2,7 +2,7 @@
 
 ## HadesArduino
 * Hades Arduino has these features available
-It has the capability to do anything with RFID whether it be for Hotel Management, For Attendance, so on or so forth.
+It has the capability to do anything with RFID whether it be for **Hotel Management** or for **Attendace** so on or so forth.
   * Attendance System
   * Checking System
   *  Whitelist System
