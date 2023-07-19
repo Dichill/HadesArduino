@@ -26,6 +26,7 @@ boolean lockMode = false;
 boolean registerMode = false;
 String commandString = "";
 String toRegister = "";
+String toRecord = "";
 
 const int BUFFER_SIZE = 256; // Adjust the buffer size based on your JSON data size
 char buffer[BUFFER_SIZE];
@@ -112,6 +113,13 @@ void loop() {
           Serial.print(",");
           toRegister = "";
         }
+
+        if (toRecord != "") {
+          Serial.print(toRecord);
+          Serial.print(",");
+          toRecord = "";
+        }
+
         Serial.println();
 
         delay(1000);
@@ -142,6 +150,7 @@ void loop() {
         if (dataList.get(i) == content.substring(1)) {
             UnlockState();
             lockMode = false;
+            toRecord = content.substring(1);
 
             delay(1000);
 
@@ -244,11 +253,10 @@ void getCommand()
     }
     
     // Remove RFID
-    // else if (inputString.substring(0, 1) == "^") {
-    //   String rfid_data = inputString.substring(1, 12);
-    //   removeStringFromList(rfid_data);
-    //   inputString = "";
-    // }
+    else if (inputString.substring(0, 1) == "^") {
+      String rfid_data = inputString.substring(1, 12);
+      removeStringFromList(rfid_data);
+    }
   }
 }
 

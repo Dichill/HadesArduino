@@ -45,6 +45,7 @@ namespace HadesArduino.MVVM.ViewModel
         public RelayCommand? OpenLogWindowCommand { get; set; }
         public RelayCommand? TurnLedCommand { get; set; }
         public RelayCommand? RegisterCommand { get; set; }
+        public RelayCommand? DeleteUserCommand { get; set; }
         SerialPort? serialPort { get; set; }
         UserService userService { get; set; }
 
@@ -70,6 +71,12 @@ namespace HadesArduino.MVVM.ViewModel
             GlobalViewModel.RegisterState = false;
             GlobalViewModel.FullNameRegister = "";
 
+
+            DeleteUserCommand = new RelayCommand(o =>
+            {
+                userService.Delete(o.ToString());
+                serialPort.Write(string.Format("^{0}\n", o));
+            });
 
             RegisterCommand = new RelayCommand(o =>
             {
@@ -222,9 +229,17 @@ namespace HadesArduino.MVVM.ViewModel
                             GlobalViewModel.FullNameRegister = "";
                         }
                     });
+                } else if (val.Length > 2 && !string.IsNullOrEmpty(val[2]))
+                {
+                    ObservableCollection<string> user_history = new ObservableCollection<string>();
+                    user_history.Add(DateTime.Now.ToString());
+
+                    userService.Update(new UserModel
+                    {
+                        RFID = val[2],
+                        history = user_history,
+                    });
                 }
-
-
             }
             catch (Exception err)
             {

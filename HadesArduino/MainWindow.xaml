@@ -92,7 +92,9 @@
                                     </hc:SimpleStackPanel>
 
                                     <hc:SimpleStackPanel Grid.Column="2" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Center" Cursor="Hand">
-                                        <Button Content="Delete" Width="70" Margin="0 0 0 2"/>
+                                        <Button Command="{Binding Path=DataContext.DeleteUserCommand, 
+                        RelativeSource={RelativeSource Mode=FindAncestor,      
+                        AncestorType={x:Type ItemsControl}} }" CommandParameter="{Binding RFID}" Content="Delete" Width="70" Margin="0 0 0 2"/>
                                         <Button Content="History" Width="70" Margin="0 0 0 2"/>
                                     </hc:SimpleStackPanel>
                                 </Grid>

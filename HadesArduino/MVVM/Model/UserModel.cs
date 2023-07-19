@@ -49,10 +49,25 @@ namespace HadesArduino.MVVM.Model
             UserModel existingUser = users.FirstOrDefault(u => u.RFID == updatedUser.RFID);
             if (existingUser != null)
             {
-                existingUser.Fullname = updatedUser.Fullname;
-                existingUser.isActive = updatedUser.isActive;
-                existingUser.dateCreated = updatedUser.dateCreated;
-                existingUser.history = updatedUser.history;
+
+                if (existingUser.Fullname == null)
+                    existingUser.Fullname = updatedUser.Fullname;
+                if (existingUser.isActive == null)
+                    existingUser.isActive = updatedUser.isActive;
+                if (existingUser.dateCreated.ToString() == "0001-01-01T00:00:00")
+                    existingUser.dateCreated = updatedUser.dateCreated;
+
+
+                // Add the new history data to the existing history
+                if (existingUser.history == null)
+                {
+                    existingUser.history = new ObservableCollection<string>();
+                }
+                foreach (string data in updatedUser.history)
+                {
+                    existingUser.history.Add(data);
+                }
+
                 SaveUsersToFile(); // Save the updated data to the file
             }
         }
