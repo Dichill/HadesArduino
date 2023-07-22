@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 C:\Users\Dichi\source\repos\HadesArduino\HadesArduino\App.xaml
-2-1269319130
+3-825414563
 
-112050644368
-197-963516820
-MainWindow.xaml;UserControl\TextDialog.xaml;
+14-850626196
+203829876796
+MainWindow.xaml;UserControl\LoadingDialog.xaml;UserControl\TextDialog.xaml;
 
-False
+True
 

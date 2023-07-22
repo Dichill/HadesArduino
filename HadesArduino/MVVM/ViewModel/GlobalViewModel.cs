@@ -68,6 +68,12 @@ namespace HadesArduino.MVVM.ViewModel
 			set { _currentRFIDRegistered = value; OnPropertyChanged(); }
 		}
 
+        private bool _registeringFromPhone;
 
-	}
+        public bool RegisteringFromPhone
+        {
+            get { return _registeringFromPhone; }
+            set { _registeringFromPhone = value; OnPropertyChanged(); }
+        }
+    }
 }
