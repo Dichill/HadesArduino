@@ -8,8 +8,7 @@ namespace HadesArduino.MVVM.Model
 {
     public class FirebaseModel
     {
-        public string full_name { get; set; }
-        public bool register_state { get; set; }
-        public bool isComplete { get; set; }
+        public string Path { get; set; }
+        public string Data { get; set; }
     }
 }

@@ -19,6 +19,9 @@ using FireSharp.Interfaces;
 using FireSharp.Config;
 using FireSharp.Response;
 using System.Windows.Threading;
+using FireSharp.Extensions;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace HadesArduino.MVVM.ViewModel
 {
@@ -44,13 +47,7 @@ namespace HadesArduino.MVVM.ViewModel
             set { _registerDialog = value; OnPropertyChanged(); }
         }
 
-        private Dialog? _registerPhoneDialog;
-
-        public Dialog? RegisterPhoneDialog
-        {
-            get { return _registerPhoneDialog; }
-            set { _registerPhoneDialog = value; OnPropertyChanged(); }
-        }
+        
 
         IFirebaseConfig ifc = new FirebaseConfig()
         {
@@ -76,33 +73,19 @@ namespace HadesArduino.MVVM.ViewModel
             SerialPortCollection?.Clear();
         }
 
-        void firebaseStream()
+        async void firebaseStream()
         {
-            Task.Run(async() =>
+            EventStreamResponse response = await client.OnAsync("register", added: (s, args, context) =>
             {
-                while (true)
+                if (args.Path == "/full_name")
                 {
-                    await Task.Delay(1000);
-                    FirebaseResponse res = await client.GetAsync(@"register");
-                    FirebaseModel model = res.ResultAs<FirebaseModel>();
+                    GlobalViewModel.FullNameRegister = args.Data;
+                    GlobalViewModel.RegisterState = true;
+                    GlobalViewModel.RegisteringFromPhone = true;
 
-                    if (model != null)
+                    if (serialPort.IsOpen)
                     {
-                        if (!model.isComplete && serialPort.IsOpen)
-                        {
-                            await Application.Current.Dispatcher.InvokeAsync(async () =>
-                            {
-                                await Task.Delay(1000);
-                                GlobalViewModel.FullNameRegister = model.full_name;
-                                GlobalViewModel.RegisterState = true;
-                                GlobalViewModel.RegisteringFromPhone = true;
-
-                                serialPort.Write("#REGI\n");
-
-                                await client.SetAsync("register", new FirebaseModel { isComplete = true });
-                                RegisterPhoneDialog = Dialog.Show<LoadingDialog>();
-                            });
-                        }
+                        serialPort.Write("#REGI\n");
                     }
                 }
             });
@@ -117,7 +100,6 @@ namespace HadesArduino.MVVM.ViewModel
             /* 
              * Firebase realated goes here
              */
-
             try
             {
                 client = new FirebaseClient(ifc);
@@ -136,8 +118,9 @@ namespace HadesArduino.MVVM.ViewModel
 
             GlobalViewModel.RoomTemperature = "0°C";
             GlobalViewModel.RoomHumidity = "0%";
-            GlobalViewModel.RegisterState = false;
             GlobalViewModel.FullNameRegister = "";
+            GlobalViewModel.RegisterState = false;
+            GlobalViewModel.RegisteringFromPhone = false;
 
 
             DeleteUserCommand = new RelayCommand(o =>
@@ -305,9 +288,9 @@ namespace HadesArduino.MVVM.ViewModel
                             }
                         } else
                         {
-                            GlobalViewModel.HadesLogs += "[HADES SUCCESS] RFID TAG: " + val[2] + " REGISTERED" + "\n";
+                            GlobalViewModel.RegisteringFromPhone = false;
                             GlobalViewModel.RegisterState = false;
-                            RegisterPhoneDialog?.Close();
+                            GlobalViewModel.HadesLogs += "[HADES SUCCESS] RFID TAG: " + val[2] + " REGISTERED" + "\n";
 
                             if (GlobalViewModel.FullNameRegister != "")
                             {
