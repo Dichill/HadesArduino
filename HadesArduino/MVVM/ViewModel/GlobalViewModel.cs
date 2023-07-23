@@ -1,9 +1,12 @@
 ﻿using HadesArduino.Core;
+using HadesArduino.UserControl;
+using HandyControl.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace HadesArduino.MVVM.ViewModel
 {
@@ -68,6 +71,20 @@ namespace HadesArduino.MVVM.ViewModel
 			set { _currentRFIDRegistered = value; OnPropertyChanged(); }
 		}
 
+        private bool _registeringFromPhone;
 
-	}
+        public bool RegisteringFromPhone
+        {
+            get { return _registeringFromPhone; }
+			set { _registeringFromPhone = value; OnPropertyChanged(); }
+        }
+
+        private Dialog? _registerPhoneDialog;
+
+        public Dialog? RegisterPhoneDialog
+        {
+            get { return _registerPhoneDialog; }
+            set { _registerPhoneDialog = value; OnPropertyChanged(); }
+        }
+    }
 }

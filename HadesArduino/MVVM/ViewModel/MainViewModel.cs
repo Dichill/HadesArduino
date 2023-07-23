@@ -14,6 +14,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
+using FireSharp;
+using FireSharp.Interfaces;
+using FireSharp.Config;
+using FireSharp.Response;
+using System.Windows.Threading;
+using FireSharp.Extensions;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace HadesArduino.MVVM.ViewModel
 {
@@ -39,6 +47,16 @@ namespace HadesArduino.MVVM.ViewModel
             set { _registerDialog = value; OnPropertyChanged(); }
         }
 
+        
+
+        IFirebaseConfig ifc = new FirebaseConfig()
+        {
+            AuthSecret = "",
+            BasePath = ""
+        };
+
+        IFirebaseClient client;
+
 
         public RelayCommand? OpenPortCommand { get; set; }
         public RelayCommand? RefreshPortCommand { get; set; }
@@ -55,11 +73,43 @@ namespace HadesArduino.MVVM.ViewModel
             SerialPortCollection?.Clear();
         }
 
+        async void firebaseStream()
+        {
+            EventStreamResponse response = await client.OnAsync("register", added: (s, args, context) =>
+            {
+                if (args.Path == "/full_name")
+                {
+                    GlobalViewModel.FullNameRegister = args.Data;
+                    GlobalViewModel.RegisterState = true;
+                    GlobalViewModel.RegisteringFromPhone = true;
+
+                    if (serialPort.IsOpen)
+                    {
+                        serialPort.Write("#REGI\n");
+                    }
+                }
+            });
+        }
+
         public MainViewModel()
         {
             GlobalViewModel.IsPortOpen = false;
             serialPort = new SerialPort();
             userService = new UserService();
+
+            /* 
+             * Firebase realated goes here
+             */
+            try
+            {
+                client = new FirebaseClient(ifc);
+            }
+            catch
+            {
+                HandyControl.Controls.MessageBox.Show("No Internet Connection!");
+            }
+
+            firebaseStream();
 
             SerialPortCollection = new ObservableCollection<string>();
             UserRegisteredCollection = userService.Read();
@@ -68,14 +118,17 @@ namespace HadesArduino.MVVM.ViewModel
 
             GlobalViewModel.RoomTemperature = "0°C";
             GlobalViewModel.RoomHumidity = "0%";
-            GlobalViewModel.RegisterState = false;
             GlobalViewModel.FullNameRegister = "";
+            GlobalViewModel.RegisterState = false;
+            GlobalViewModel.RegisteringFromPhone = false;
 
 
             DeleteUserCommand = new RelayCommand(o =>
             {
                 userService.Delete(o.ToString());
-                serialPort.Write(string.Format("^{0}\n", o));
+
+                if (serialPort.IsOpen)
+                    serialPort.Write(string.Format("^{0}\n", o));
             });
 
             RegisterCommand = new RelayCommand(o =>
@@ -210,24 +263,53 @@ namespace HadesArduino.MVVM.ViewModel
 
                 if (val.Length > 2 && GlobalViewModel.RegisterState && !string.IsNullOrEmpty(val[2]))
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(async () =>
                     {
-                        GlobalViewModel.HadesLogs += "[HADES SUCCESS] RFID TAG: " + val[2] + " REGISTERED" + "\n";
-                        GlobalViewModel.RegisterState = false;
-                        RegisterDialog?.Close();
+                        
+                        if (!GlobalViewModel.RegisteringFromPhone)
+                        {
+                            GlobalViewModel.RegisterState = false;
+                            RegisterDialog?.Close();
 
-                        if (GlobalViewModel.FullNameRegister != "")
-                        {                            
-                            userService.Create(new UserModel
+                            if (GlobalViewModel.FullNameRegister != "")
                             {
-                                Fullname = GlobalViewModel.FullNameRegister,
-                                RFID = val[2],
-                                isActive = true,
-                                dateCreated = DateTime.Now,
-                            });
-                            GlobalViewModel.CurrentRFIDRegistered = val[2];
-                            GlobalViewModel.FullNameRegister = "";
+                                userService.Create(new UserModel
+                                {
+                                    Fullname = GlobalViewModel.FullNameRegister,
+                                    RFID = val[2],
+                                    isActive = true,
+                                    dateCreated = DateTime.Now,
+                                });
+                                GlobalViewModel.CurrentRFIDRegistered = val[2];
+                                GlobalViewModel.FullNameRegister = "";
+                            
+                                GlobalViewModel.HadesLogs += "[HADES SUCCESS] RFID TAG: " + val[2] + " REGISTERED" + "\n";
+
+                            }
+                        } else
+                        {
+                            GlobalViewModel.RegisteringFromPhone = false;
+                            GlobalViewModel.RegisterState = false;
+                            GlobalViewModel.HadesLogs += "[HADES SUCCESS] RFID TAG: " + val[2] + " REGISTERED" + "\n";
+
+                            if (GlobalViewModel.FullNameRegister != "")
+                            {
+                                userService.Create(new UserModel
+                                {
+                                    Fullname = GlobalViewModel.FullNameRegister,
+                                    RFID = val[2],
+                                    isActive = true,
+                                    dateCreated = DateTime.Now,
+                                });
+
+                                GlobalViewModel.CurrentRFIDRegistered = val[2];
+                                GlobalViewModel.FullNameRegister = "";
+                            }
+
+                            FirebaseResponse response = await client.DeleteAsync("register"); 
                         }
+
+
                     });
                 } else if (val.Length > 2 && !string.IsNullOrEmpty(val[2]))
                 {
@@ -243,9 +325,7 @@ namespace HadesArduino.MVVM.ViewModel
             }
             catch (Exception err)
             {
-                //MessageBox.Show("An unexpected error has occured, see full details below\n" + err.ToString(), "Hades System", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 GlobalViewModel.HadesLogs += "[HADES-WARNING] " + err.Message + "\n" + err.ToString();
-                //serialPort?.Close();
             }
 
             GlobalViewModel.HadesLogs += "[HADES LOGS] ~ " + data + "\n";

@@ -5,6 +5,7 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HadesArduino"
+             xmlns:converter="clr-namespace:HadesArduino.Converter"
         xmlns:vm="clr-namespace:HadesArduino.MVVM.ViewModel"
         mc:Ignorable="d"
         ShowTitle="True"
@@ -16,6 +17,10 @@
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
+
+    <Window.Resources>
+        <converter:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Hidden"/>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -104,6 +109,27 @@
                 </ListView>
             </Border>
             <TextBox Margin="5 5 5 0" Grid.Row="01" Grid.Column="0" Text="{Binding GlobalViewModel.HadesLogs}"/>
+        </Grid>
+
+        <Grid Grid.RowSpan="2" Visibility="{Binding GlobalViewModel.RegisteringFromPhone, Converter={StaticResource BoolToHiddenConverter}}">
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.3"/>
+            </Grid.Background>
+            <Border CornerRadius="10"
+                    Width="400"
+                    MaxWidth="400"
+                    Height="247"
+                    Background="{DynamicResource RegionBrush}">
+                    <Grid>
+                        <Grid x:Name="SecondGrid" Visibility="Visible">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <hc:LoadingLine Margin="0,30" Foreground="Yellow" Style="{StaticResource LoadingLineLarge}"/>
+                                <TextBlock Style="{StaticResource TextBlockLargeBold}" FontSize="15" Text="Registering from Phone"/>
+                                <TextBlock Style="{StaticResource TextBlockBaseStyle}" FontSize="12" Text="Tap Card when Yellow Light Flashes"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+            </Border>
         </Grid>
     </Grid>
 </hc:Window>
