@@ -115,18 +115,26 @@ void loop() {
   }
 
   /* 
+   * 
+   * ADD YOUR OWN CODE HERE
+   * You can add your code down below here, but do take not on how to properly format the printing of serials.
+   *
    * IMPORTANT
    * Make sure that toRegister & toRecord will be in the 2nd `,`
    * [ToRegister is only called once, thus the reason why they are fine if both of them are at the 2nd comma `,`]
    * e.g. data1, data2, toRegister_value,
    * e.g. data1, data2, toRecord_value,
   */
+
+  // Temperature Value using any sensors such as BMP280 or DHT11 etc.
   Serial.print("0");
   Serial.print(",");
 
+  // Humidity Value using any sensors that supports Humidity
   Serial.print("0");
   Serial.print(",");
 
+  // Registration Logic goes here, do not make any changes unless you know what you are doing
   if (toRegister != "") {
     Serial.print(toRegister);
     Serial.print(",");
@@ -139,6 +147,7 @@ void loop() {
     toRecord = "";
   }
 
+  // End the line so that the Interpreter (HadesArduino Software) can easily parse each line of the serial comms.
   Serial.println();
 
   delay(1000);
